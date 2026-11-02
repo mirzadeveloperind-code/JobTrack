@@ -1,4 +1,5 @@
-name: Deploy JobTrack Frontend
+
+name: Deploy JobTrack to GitHub Pages
 
 on:
   push:
@@ -15,10 +16,11 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build:
+  build-and-deploy:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
+
     runs-on: ubuntu-latest
 
     steps:
@@ -34,11 +36,14 @@ jobs:
         working-directory: frontend
         run: npm ci
 
-      - name: Build frontend
+      - name: Build project
         working-directory: frontend
         run: npm run build
 
-      - name: Setup Pages
+      - name: Verify build
+        run: test -f frontend/dist/index.html
+
+      - name: Configure Pages
         uses: actions/configure-pages@v5
 
       - name: Upload artifact
